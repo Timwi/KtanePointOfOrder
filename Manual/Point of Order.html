@@ -1,34 +1,86 @@
-﻿<!DOCTYPE html>
 <html class="no-js">
-<head>
-    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
-    <meta content="IE=edge" http-equiv="X-UA-Compatible">
-    <title>Point of Order — Keep Talking and Nobody Explodes Module</title>
-    <meta content="initial-scale=1" name="viewport">
-    <link href='//fonts.googleapis.com/css?family=Special+Elite' rel='stylesheet' type='text/css'>
-    <link href="css/normalize.css" rel="stylesheet" type="text/css">
-    <link href="css/main.css" rel="stylesheet" type="text/css">
-    <style>
-    </style>
-</head>
-<body>
-    <div id="ManualContent">
-        <div class="section">
-            <div class="page">
-                <div class="page-header">
-                    <span class="page-header-doc-title">Keep Talking and Nobody Explodes Mod</span>
-                    <span class="page-header-section-title">Point of Order</span>
-                </div>
-                <div class="page-content">
-                    <img class="diagram" src="img/Point of Order.svg">
-                    <h2>On the Subject of Point of Order</h2>
+	<head>
+		<title>Point of Order — Keep Talking and Nobody Explodes Mod</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="initial-scale=1">
+		<link rel="stylesheet" type="text/css" href="css/normalize.css">
+		<link rel="stylesheet" type="text/css" href="css/main.css">
+		<link rel='stylesheet' type='text/css' href='css/font.css'>
+		<script src='js/highlighter.js'></script>
+        <style>
+            p.footnote {
+                font-size: smaller;
+                font-style: italic;
+            }
+            li {
+                margin: 1em 0;
+            }
+        </style>
+	</head>
+	<body>
+		<div class="section">
+			<div class="page page-bg-07">
+				<div class="page-header">
+					<span class="page-header-doc-title">Keep Talking and Nobody Explodes Mod</span>
+					<span class="page-header-section-title">Point of Order</span>
+				</div>
+				<div class="page-content">
+					<img src="img/Component/Point of Order.svg" class="diagram">
+					<h2>On the Subject of Points of Order</h2>
+					<p class="flavour-text">That’s the badger.</p>
 
-                    <p class="flavour-text">(flavour text)
+                    <ul>
+                        <li>Welcome to this game of Mao. You joined at just the right time. We’ve already played five cards in accordance with the current rules of the game.
+                        <li>You have four cards on your hand. Once you pick up your cards, you must play a valid card within 5 seconds to defuse the module.
+                        <li>Playing a bad card or failing to play a card within 5 seconds will result in a strike. You will also receive four new cards.
+                    </ul>
 
-                </div>
-                <div class="page-footer relative-footer">Page 1 of 1</div>
-            </div>
-        </div>
-    </div>
-</body>
+                    <p>
+                        To find out what the current rules of the game are, examine the cards already played and
+                        determine which <em>two</em> of the following rules are active and which one is inactive:
+                    </p>
+
+                    <ol>
+                        <li>Examine the first and second character
+                            of the serial number. Depending on whether each is a letter or a number, the next card’s suit must be one of the following:
+                            <table>
+                                <tr><th rowspan='2'>First character<th rowspan='2'>Second character</th><th colspan='4'>Previously-played suit</th></tr>
+                                <tr><th>♠<th>♥<th>♣<th>♦</tr>
+                                <tr><th>Letter<th>Letter<td>♠ or ♥<td>♥ or ♣<td>♣ or ♦<td>♦ or ♠</tr>
+                                <tr><th>Letter<th>Number<td>♠ or ♦<td>♥ or ♠<td>♣ or ♥<td>♦ or ♣</tr>
+                                <tr><th>Number<th>Letter<td>♥ or ♣<td>♣ or ♦<td>♦ or ♠<td>♠ or ♥</tr>
+                                <tr><th>Number<th>Number<td>♦ or ♣<td>♠ or ♦<td>♥ or ♠<td>♣ or ♥</tr>
+                            </table>
+                        <li>
+                            Ranks must alternate between being divisible and not divisible by
+                            the fourth character of the serial number, modulo 3, plus 3.
+                        <li>
+                            Ranks of consecutive cards must have a difference of <var>x</var> + 2 or <var>x</var> + 3
+                            (with wraparound allowed), where <var>x</var> is the alphabetic position of
+                            the fifth character of the serial number, modulo 3.
+                        </li>
+                    </ol>
+
+                    <p>Ranks are considered to be numbered from 1 (Ace) to 13 (King).</p>
+
+                    <p>Only one of the four cards in front of you is valid to play under the two active rules.</p>
+
+                    <p class="footnote">This manual page was initially withheld when the module was released
+                        and the community figured them out. Kudos to the sharp and clever thinkers!
+                        Elias5891,
+                        Hexicube,
+                        luc537,
+                        Nightmare Tank,
+                        Ocean Waves,
+                        onewingedangel30,
+                        porcu93,
+                        Storm Vision,
+                        Trainzack</p>
+
+				</div>
+				<div class="page-footer relative-footer">Page 1 of 1</div>
+			</div>
+		</div>
+	</body>
 </html>
