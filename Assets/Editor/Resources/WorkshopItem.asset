@@ -13,8 +13,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   WorkshopPublishedFileID: 955137794
   Title: Point of Order
-  Description: "Can you figure out the rules to this module?\r\n\r\n[url=http://ktane.timwi.de/HTML/Point%20of%20Order.html]Participate
-    in the Point of Order challenge![/url]\r\n\r\nModule created by Timwi."
+  Description: "All hail KTANE.\n\r\nModule created by Timwi.\n\n[url=http://ktane.timwi.de/HTML/Point%20of%20Order.html]Manual
+    HTML[/url]\r\n[url=http://ktane.timwi.de/PDF/Point%20of%20Order.pdf]Manual PDF[/url]\r"
   PreviewImage: {fileID: 2800000, guid: bd5c1f4881f57d54481b44e4c8a7779a, type: 3}
   Tags:
   - Regular Module
