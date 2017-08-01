@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using PointOfOrder;
 using UnityEngine;
 
@@ -42,6 +43,7 @@ public class PointOfOrderModule : MonoBehaviour
     private List<PlayingCard> _pile;
     private PlayingCard[] _acceptableCards;
     private PlayingCard[] _possibleWrongCards;
+    private PlayingCard[] _cardsOnTable;
     private Func<PlayingCard, List<PlayingCard>, bool>[] _activeRules;
     private Func<PlayingCard, List<PlayingCard>, bool>[] _inactiveRules;
 
@@ -201,12 +203,14 @@ public class PointOfOrderModule : MonoBehaviour
         _possibleWrongCards.Shuffle();
 
         _correctCardIndex = Rnd.Range(0, _numChoiceCards);
+        _cardsOnTable = new PlayingCard[_numChoiceCards];
 
         for (int i = 0; i < _numChoiceCards; i++)
         {
             _frontFaces[i].enabled = true;
-            _frontFaces[i].material.mainTexture = getTexture(i == _correctCardIndex ? correctCard : _possibleWrongCards[i]);
-            Debug.LogFormat("[Point of Order #{0}] Card #{1} = {2}{3}", _moduleId, i + 1, i == _correctCardIndex ? correctCard : _possibleWrongCards[i], i == _correctCardIndex ? " (correct)" : " (wrong)");
+            _cardsOnTable[i] = i == _correctCardIndex ? correctCard : _possibleWrongCards[i];
+            _frontFaces[i].material.mainTexture = getTexture(_cardsOnTable[i]);
+            Debug.LogFormat("[Point of Order #{0}] Card #{1} = {2}{3}", _moduleId, i + 1, _cardsOnTable[i], i == _correctCardIndex ? " (correct)" : " (wrong)");
             StartCoroutine(flipCard(i, flipDown: false));
         }
 
@@ -326,5 +330,51 @@ public class PointOfOrderModule : MonoBehaviour
             _pile.RemoveAt(_pile.Count - 1);
         }
         return false;
+    }
+
+    public string TwitchHelpMessage = @"play [rank/s] of [suits/s]; for example: play 4/5/J/Q of S/D. The module will turn over the cards and automatically play a card that matches the criteria.";
+
+    private Dictionary<string, Rank> _allowedRanks = @"A,2,3,4,5,6,7,8,9,10,J,Q,K,Ace,Two,Three,Four,Five,Six,Seven,Eight,Nine,Ten,Jack,Queen,King".Split(',')
+        .Select((str, index) => new { Str = str, Rank = (Rank) (index % 13) })
+        .ToDictionary(s => s.Str, s => s.Rank, StringComparer.InvariantCultureIgnoreCase);
+
+    private Dictionary<string, Suit> _allowedSuits = @"S,H,C,D,spades,hearts,clubs,diamonds".Split(',')
+        .Select((str, index) => new { Str = str, Suit = (Suit) (index % 4) })
+        .ToDictionary(s => s.Str, s => s.Suit, StringComparer.InvariantCultureIgnoreCase);
+
+    private IEnumerator ProcessTwitchCommand(string command)
+    {
+        var m = Regex.Match(command, @"^play ([^\s]+) of ([^\s]+)$");
+        if (!m.Success || _state != State.FaceDown)
+            yield break;
+
+        var rankStrs = m.Groups[1].Value.Split('/');
+        var suitStrs = m.Groups[2].Value.Split('/');
+        if (!rankStrs.All(_allowedRanks.ContainsKey) || !suitStrs.All(_allowedSuits.ContainsKey))
+            yield break;
+
+        var ranks = new HashSet<Rank>(rankStrs.Select(s => _allowedRanks[s]));
+        var suits = new HashSet<Suit>(suitStrs.Select(s => _allowedSuits[s]));
+
+        Debug.LogFormat("[Point of Order #{0}] Received Twitch Plays command to play {1} of {2}.", _moduleId, ranks.JoinString("/"), suits.JoinString("/"));
+
+        yield return null;
+        _choiceCards[0].OnInteract(); ;
+        yield return new WaitForSeconds(2f);
+
+        // This should never happen
+        if (_state != State.FaceUp)
+            yield break;
+
+        for (int i = 0; i < _numChoiceCards; i++)
+            if (ranks.Contains(_cardsOnTable[i].Rank) && suits.Contains(_cardsOnTable[i].Suit))
+            {
+                _choiceCards[i].OnInteract();
+                yield return new WaitForSeconds(.5f);
+                yield break;
+            }
+
+        // If we get here, none of the cards match the criterion, so eventually the timeout will occur and a strike will be awarded
+        yield return "strike";
     }
 }
