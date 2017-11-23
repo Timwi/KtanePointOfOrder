@@ -80,7 +80,7 @@ public class AssetBundler
     {
         Debug.LogFormat("Creating \"{0}\" AssetBundle...", BUNDLE_FILENAME);
 
-        if (ModConfig.Instance == null
+        if (ModConfig.Instance == null 
             || ModConfig.ID == ""
             || ModConfig.OutputFolder == "")
         {
@@ -123,7 +123,7 @@ public class AssetBundler
             //Copy any other non-Editor managed assemblies to the output folder
             bundler.CopyManagedAssemblies();
 
-            //Create the modInfo.json file
+            //Create the modInfo.json file and copy the preview image if available
             bundler.CreateModInfo();
 
             //Copy the modSettings.json file from Assets into the build
@@ -190,7 +190,7 @@ public class AssetBundler
 
         //modify the csproj (if needed)
         var csproj = File.ReadAllText("ktanemodkit.CSharp.csproj");
-        csproj = csproj.Replace("<AssemblyName>Assembly-CSharp</AssemblyName>", "<AssemblyName>" + assemblyName + "</AssemblyName>");
+        csproj = csproj.Replace("<AssemblyName>Assembly-CSharp</AssemblyName>", "<AssemblyName>"+ assemblyName + "</AssemblyName>");
         File.WriteAllText("modkithelper.CSharp.csproj", csproj);
 
         string path = "modkithelper.CSharp.csproj";
@@ -262,10 +262,10 @@ public class AssetBundler
         string[] defineArray = allDefines.Split(';');
 
         //MonoIsland to compile
-        string classlib_profile = "2.0";
+        int apiCompatibilityLevel = 1; //NET_2_0 compatibility level is enum value 1
         Assembly assembly = Assembly.GetAssembly(typeof(MonoScript));
         var monoIslandType = assembly.GetType("UnityEditor.Scripting.MonoIsland");
-        object monoIsland = Activator.CreateInstance(monoIslandType, BuildTarget.StandaloneWindows, classlib_profile, scriptArray, referenceArray, defineArray, outputFilename);
+        object monoIsland = Activator.CreateInstance(monoIslandType, BuildTarget.StandaloneWindows, apiCompatibilityLevel, scriptArray, referenceArray, defineArray, outputFilename);
 
         //MonoCompiler itself
         var monoCompilerType = assembly.GetType("UnityEditor.Scripting.Compilers.MonoCSharpCompiler");
@@ -277,7 +277,7 @@ public class AssetBundler
 
         //CompilerMessage
         var compilerMessageType = assembly.GetType("UnityEditor.Scripting.Compilers.CompilerMessage");
-        FieldInfo messageField = compilerMessageType.GetField("message");
+        FieldInfo messageField = compilerMessageType.GetField("message"); 
 
         //Start compiling
         beginCompilingMethod.Invoke(monoCompiler, null);
@@ -421,8 +421,8 @@ public class AssetBundler
         //not be accessible within the asset bundle. Unity has deprecated this flag claiming it is now always active, but due to a bug
         //we must still include it (and ignore the warning).
         BuildPipeline.BuildAssetBundles(
-            TEMP_BUILD_FOLDER,
-            BuildAssetBundleOptions.DeterministicAssetBundle | BuildAssetBundleOptions.CollectDependencies,
+            TEMP_BUILD_FOLDER, 
+            BuildAssetBundleOptions.DeterministicAssetBundle | BuildAssetBundleOptions.CollectDependencies, 
             BuildTarget.StandaloneWindows);
 #pragma warning restore 618
 
@@ -439,6 +439,12 @@ public class AssetBundler
     protected void CreateModInfo()
     {
         File.WriteAllText(outputFolder + "/modInfo.json", ModConfig.Instance.ToJson());
+
+        if(ModConfig.PreviewImage != null)
+        {
+            byte[] bytes = ModConfig.PreviewImage.EncodeToPNG();
+            File.WriteAllBytes(outputFolder + "/previewImage.png", bytes);
+        }
     }
 
     /// <summary>

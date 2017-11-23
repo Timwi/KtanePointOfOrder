@@ -20,6 +20,8 @@ public class PointOfOrderModule : MonoBehaviour
 
     public GameObject CardObj;
     public Transform Main;
+    public Texture[] CardImages;
+    public Texture[] BackImages;
 
     private static int _moduleIdCounter = 1;
     private int _moduleId;
@@ -114,15 +116,14 @@ public class PointOfOrderModule : MonoBehaviour
 
         for (int i = 0; i < _pile.Count; i++)
         {
-            var card = Main.FindChild("PileCard" + (i + 1));
+            var card = Main.Find("PileCard" + (i + 1));
             card.GetComponent<MeshRenderer>().material.mainTexture = getTexture(_pile[i]);
             card.GetComponent<MeshRenderer>().sortingOrder = -_pile.Count + i - 1;
             card.localPosition = new Vector3(interp(-.05f, .05f, i, _pile.Count), .01501f, .045f - .005f * i);
             card.localRotation = Quaternion.Euler(90, -25 + 10f * i + Rnd.Range(0f, 5f), 0);
         }
 
-        var backfaceTexture = new Texture2D(2, 2);
-        backfaceTexture.LoadImage(RawPngs.BackData[Rnd.Range(0, RawPngs.BackData.Length)]);
+        var backfaceTexture = BackImages[Rnd.Range(0, BackImages.Length)];
 
         _choiceCards = new KMSelectable[_numChoiceCards];
         _choiceCardCards = new Transform[_numChoiceCards];
@@ -134,30 +135,28 @@ public class PointOfOrderModule : MonoBehaviour
             setupChoiceCard(i, backfaceTexture);
     }
 
-    private Texture2D getTexture(PlayingCard card)
+    private Texture getTexture(PlayingCard card)
     {
-        var tx = new Texture2D(2, 2);
-        tx.LoadImage(RawPngs.CardData[card.Suit][card.Rank]);
-        return tx;
+        return CardImages.First(ci => ci.name == card.Rank + " of " + card.Suit);
     }
 
     private void setupChoiceCard(int index, Texture backfaceTexture)
     {
-        var card = Main.FindChild("ChoiceCard" + (index + 1));
+        var card = Main.Find("ChoiceCard" + (index + 1));
         card.localPosition = new Vector3(interp(-.062f, .062f, index, _numChoiceCards - 1), .01501f, -.045f);
-        card.FindChild("Highlight").FindChild("Highlight(Clone)").GetComponent<MeshRenderer>().sortingOrder = -2;
+        card.Find("Highlight").Find("Highlight(Clone)").GetComponent<MeshRenderer>().sortingOrder = -2;
 
-        _choiceCardCards[index] = card.FindChild("Card");
+        _choiceCardCards[index] = card.Find("Card");
 
-        _frontFaces[index] = _choiceCardCards[index].FindChild("FrontFace").GetComponent<MeshRenderer>();
+        _frontFaces[index] = _choiceCardCards[index].Find("FrontFace").GetComponent<MeshRenderer>();
         _frontFaces[index].enabled = false;
         _frontFaces[index].sortingOrder = -1;
 
-        _backFaces[index] = _choiceCardCards[index].FindChild("BackFace").GetComponent<MeshRenderer>();
+        _backFaces[index] = _choiceCardCards[index].Find("BackFace").GetComponent<MeshRenderer>();
         _backFaces[index].material.mainTexture = backfaceTexture;
         _backFaces[index].sortingOrder = -1;
 
-        _choiceCardHighlights[index] = card.FindChild("Highlight");
+        _choiceCardHighlights[index] = card.Find("Highlight");
 
         _choiceCards[index] = card.GetComponent<KMSelectable>();
         _choiceCards[index].OnInteract = delegate
@@ -332,7 +331,9 @@ public class PointOfOrderModule : MonoBehaviour
         return false;
     }
 
-    public string TwitchHelpMessage = @"play [rank/s] of [suits/s]; for example: play 4/5/J/Q of S/D. The module will turn over the cards and automatically play a card that matches the criteria.";
+#pragma warning disable 414
+    private string TwitchHelpMessage = @"play [rank/s] of [suits/s]; for example: play 4/5/J/Q of S/D. The module will turn over the cards and automatically play a card that matches the criteria.";
+#pragma warning restore 414
 
     private Dictionary<string, Rank> _allowedRanks = @"A,2,3,4,5,6,7,8,9,10,J,Q,K,Ace,Two,Three,Four,Five,Six,Seven,Eight,Nine,Ten,Jack,Queen,King".Split(',')
         .Select((str, index) => new { Str = str, Rank = (Rank) (index % 13) })
