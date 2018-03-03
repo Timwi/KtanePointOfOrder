@@ -345,6 +345,11 @@ public class PointOfOrderModule : MonoBehaviour
 
     private IEnumerator ProcessTwitchCommand(string command)
     {
+        if (command.ToLowerInvariant() == "clarify")
+        {
+            yield return null;
+            yield return string.Format("sendtochat Pile: {0}", _pile.JoinString(", "));
+        }
         var m = Regex.Match(command, @"^play ([^\s]+) of ([^\s]+)$");
         if (!m.Success || _state != State.FaceDown)
             yield break;
