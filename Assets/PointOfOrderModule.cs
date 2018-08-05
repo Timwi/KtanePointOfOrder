@@ -180,10 +180,39 @@ public class PointOfOrderModule : MonoBehaviour
                         for (int i = 0; i < _numChoiceCards; i++)
                             _choiceCardHighlights[i].gameObject.SetActive(false);
                         StartCoroutine(playCard(index));
+
+                        string soundName = _cardsOnTable[_correctCardIndex].Rank == Rank.Seven ? "haveaniceday" : "mao";
+                        switch (_cardsOnTable[_correctCardIndex].Suit)
+                        {
+                            case Suit.Spades:
+                                switch (_cardsOnTable[_correctCardIndex].Rank)
+                                {
+                                    case Rank.Ace: soundName = "Aceofspades"; break;
+                                    case Rank.Two: soundName = "2ofspades"; break;
+                                    case Rank.Three: soundName = "3ofspades"; break;
+                                    case Rank.Four: soundName = "4ofspades"; break;
+                                    case Rank.Five: soundName = "5ofspades"; break;
+                                    case Rank.Six: soundName = "6ofspades"; break;
+                                    case Rank.Seven: soundName = "7ofspadeshaveaniceday"; break;
+                                    case Rank.Eight: soundName = "8ofspades"; break;
+                                    case Rank.Nine: soundName = "9ofspades"; break;
+                                    case Rank.Ten: soundName = "10ofspades"; break;
+                                    case Rank.Jack: soundName = "Jackofspades"; break;
+                                    case Rank.Queen: soundName = "Queenofspades"; break;
+                                    case Rank.King: soundName = "Kingofspades"; break;
+                                }
+                                break;
+                            case Suit.Diamonds:
+                                if (_cardsOnTable[_correctCardIndex].Rank == Rank.Nine)
+                                    soundName = "thatsthebadger";
+                                break;
+                        }
+                        Audio.PlaySoundAtTransform(soundName, transform);
                     }
                     else
                     {
                         Debug.LogFormat("[Point of Order #{0}] #{1}: Bad card. Point of order.", _moduleId, index + 1);
+                        StartCoroutine(delayedSound("badcard"));
                         Module.HandleStrike();
                         _state = State.WrongCardPressed;
                     }
@@ -198,7 +227,6 @@ public class PointOfOrderModule : MonoBehaviour
         Debug.LogFormat("[Point of Order #{0}] End of point of order.", _moduleId);
 
         var correctCard = _acceptableCards[Rnd.Range(0, _acceptableCards.Length)];
-        //var wrongCards = PlayingCard.AllCards.Except(_acceptableCards).ToList().Shuffle();
         _possibleWrongCards.Shuffle();
 
         _correctCardIndex = Rnd.Range(0, _numChoiceCards);
@@ -226,6 +254,7 @@ public class PointOfOrderModule : MonoBehaviour
         {
             // The user did not play a card in time.
             Debug.LogFormat("[Point of Order #{0}] Failure to play within five seconds.", _moduleId);
+            StartCoroutine(delayedSound("5seconds"));
             Module.HandleStrike();
         }
 
@@ -233,6 +262,12 @@ public class PointOfOrderModule : MonoBehaviour
 
         for (int i = 0; i < _numChoiceCards; i++)
             StartCoroutine(flipCard(i, flipDown: true, isLast: i == _numChoiceCards - 1));
+    }
+
+    private IEnumerator delayedSound(string soundName)
+    {
+        yield return new WaitForSeconds(.5f);
+        Audio.PlaySoundAtTransform(soundName, transform);
     }
 
     private IEnumerator flipCard(int index, bool flipDown, bool isLast = false)
