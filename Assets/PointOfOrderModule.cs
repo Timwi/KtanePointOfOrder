@@ -274,6 +274,7 @@ public class PointOfOrderModule : MonoBehaviour
     {
         _choiceCardLocked[index] = true;
         yield return new WaitForSeconds(.2f * index);
+        Audio.PlaySoundAtTransform("cardflip", _choiceCardCards[index].transform);
 
         foreach (var _ in animationLoop(0, 180, 360, i =>
         {
