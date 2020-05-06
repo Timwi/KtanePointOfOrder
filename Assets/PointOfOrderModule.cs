@@ -396,7 +396,7 @@ public class PointOfOrderModule : MonoBehaviour
         Debug.LogFormat("[Point of Order #{0}] Received Twitch Plays command to play {1} of {2}.", _moduleId, ranks.JoinString("/"), suits.JoinString("/"));
 
         yield return null;
-        _choiceCards[0].OnInteract(); ;
+        _choiceCards[0].OnInteract();
         yield return new WaitForSeconds(2f);
 
         // This should never happen
@@ -413,5 +413,21 @@ public class PointOfOrderModule : MonoBehaviour
 
         // If we get here, none of the cards match the criterion, so eventually the timeout will occur and a strike will be awarded
         yield return "strike";
+    }
+
+    IEnumerator TwitchHandleForcedSolve()
+    {
+        while (_state != State.FaceUp && _state != State.FaceDown)
+            yield return true;
+
+        if (_state == State.FaceDown)
+            _choiceCards[0].OnInteract();
+
+        while (_state != State.FaceUp)
+            yield return null;
+
+        yield return new WaitForSeconds(1f);
+        _choiceCards[_correctCardIndex].OnInteract();
+        yield return new WaitForSeconds(1f);
     }
 }
