@@ -39,7 +39,7 @@ public class PointOfOrderModule : MonoBehaviour
     private Transform[] _choiceCardHighlights;
     private MeshRenderer[] _frontFaces;
     private MeshRenderer[] _backFaces;
-    private bool[] _choiceCardLocked = new bool[_numChoiceCards];
+    private readonly bool[] _choiceCardLocked = new bool[_numChoiceCards];
 
     private int _correctCardIndex;
     private List<PlayingCard> _pile;
