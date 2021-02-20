@@ -423,7 +423,7 @@ public class PointOfOrderModule : MonoBehaviour
         if (_state == State.FaceDown)
             _choiceCards[0].OnInteract();
 
-        while (_state != State.FaceUp)
+        while (_state != State.FaceUp || _choiceCardLocked[_correctCardIndex])
             yield return null;
 
         yield return new WaitForSeconds(1f);
