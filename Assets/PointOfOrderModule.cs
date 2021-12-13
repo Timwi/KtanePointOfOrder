@@ -371,11 +371,11 @@ public class PointOfOrderModule : MonoBehaviour
     private string TwitchHelpMessage = @"play [rank/s] of [suits/s]; for example: play 4/5/J/Q of S/D. The module will turn over the cards and automatically play a card that matches the criteria.";
 #pragma warning restore 414
 
-    private Dictionary<string, Rank> _allowedRanks = @"A,2,3,4,5,6,7,8,9,10,J,Q,K,Ace,Two,Three,Four,Five,Six,Seven,Eight,Nine,Ten,Jack,Queen,King".Split(',')
+    private readonly Dictionary<string, Rank> _allowedRanks = @"A,2,3,4,5,6,7,8,9,10,J,Q,K,Ace,Two,Three,Four,Five,Six,Seven,Eight,Nine,Ten,Jack,Queen,King".Split(',')
         .Select((str, index) => new { Str = str, Rank = (Rank) (index % 13) })
         .ToDictionary(s => s.Str, s => s.Rank, StringComparer.InvariantCultureIgnoreCase);
 
-    private Dictionary<string, Suit> _allowedSuits = @"S,H,C,D,spades,hearts,clubs,diamonds".Split(',')
+    private readonly Dictionary<string, Suit> _allowedSuits = @"S,H,C,D,spades,hearts,clubs,diamonds,♠,♥,♣,♦".Split(',')
         .Select((str, index) => new { Str = str, Suit = (Suit) (index % 4) })
         .ToDictionary(s => s.Str, s => s.Suit, StringComparer.InvariantCultureIgnoreCase);
 
